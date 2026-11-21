@@ -5,7 +5,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "nativephp/mobile": "^4.8"
+        "nativephp/mobile": "^4.8",
+        "firstlightui/nativephp": "dev-main"
     },
     "autoload": {
         "psr-4": {
@@ -24,7 +25,7 @@
             ]
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require-dev": {
         "pestphp/pest": "^5.0",
         "orchestra/testbench": "^11.0",
@@ -40,5 +41,6 @@
         "test": "pest",
         "lint": "pint --test",
         "analyse": "phpstan analyse --no-progress --memory-limit=1G"
-    }
+    },
+    "prefer-stable": true
 }

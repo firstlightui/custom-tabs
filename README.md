@@ -2,7 +2,7 @@
 
 Let people choose and reorder the tabs of your NativePHP Mobile app, within the tabs, locks and limits you declare.
 
-Work in progress: the PHP core is in place; the editor screen, the More screen and the reorder control are being built. Not released yet.
+Work in progress, not released yet. It needs Firstlight's Reorder List, which is on Firstlight `main` and not yet in a release.
 
 ```php
 use FirstlightUI\CustomTabs\Facades\CustomTabs;
@@ -22,6 +22,13 @@ public function tabBar(NativeComponent $screen): ?TabBar
 {
     return CustomTabs::bar('main');
 }
+
+// routes/mobile.php: the More screen at the More tab's URL, and the editor below it (/more/edit)
+Route::customTabs('main', TabsLayout::class);
 ```
+
+The More screen lists the tabs people moved out of the bar, with Edit in the navigation bar. The editor shows the bar and More as two sections of a Firstlight Reorder List: people drag tabs, or use the VoiceOver and TalkBack actions, and each move is checked against your rules at once. A tab dropped into a full bar pushes the last movable tab into More. Nothing is saved until Done; Reset to default asks first.
+
+To put the editor in your own settings screen instead, extend `FirstlightUI\CustomTabs\Screens\EditorScreen`, or use `CustomTabs::preview()` and `CustomTabs::save()` with your own `<firstlight:reorder-list>`. The strings are in `lang/en/tabs.php`; publish them with `php artisan vendor:publish --tag=custom-tabs-lang`.
 
 Free and MIT licensed.

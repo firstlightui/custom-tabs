@@ -8,8 +8,8 @@ use Closure;
 use FirstlightUI\CustomTabs\Events\TabsCustomized;
 use FirstlightUI\CustomTabs\Stores\TabPreferenceStore;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Events\Dispatcher;
 use InvalidArgumentException;
+use Native\Mobile\Edge\CallbackRegistry;
 
 final class CustomTabs
 {
@@ -22,7 +22,6 @@ final class CustomTabs
     public function __construct(
         private readonly TabPreferenceStore $store,
         private readonly Gate $gate,
-        private readonly Dispatcher $events,
     ) {}
 
     /** @param Closure(TabSet): mixed $definition */
@@ -72,7 +71,7 @@ final class CustomTabs
     public function save(string $name, array $bar, array $more): Arrangement
     {
         $set = $this->set($name);
-        $arrangement = Arrangement::resolve($set, ['bar' => $bar, 'more' => $more], $this->allowed(...));
+        $arrangement = $this->preview($name, $bar, $more);
 
         $previous = $this->store->get($name) ?? [];
         $hidden = array_keys(array_filter($set->tabs(), fn (DeclaredTab $tab) => ! $this->allowed($tab)));
@@ -86,9 +85,64 @@ final class CustomTabs
         }
 
         $this->store->put($name, $value);
-        $this->events->dispatch(new TabsCustomized($name, $arrangement));
+        event(new TabsCustomized($name, $arrangement));
 
         return $arrangement;
+    }
+
+    /**
+     * What a choice would become under the rules, without saving it. The editor shows this after
+     * every move, so a tab dropped into a full bar pushes the last one into More at once.
+     *
+     * @param  list<string>  $bar
+     * @param  list<string>  $more
+     */
+    public function preview(string $name, array $bar, array $more): Arrangement
+    {
+        return Arrangement::resolve($this->set($name), ['bar' => $bar, 'more' => $more], $this->allowed(...));
+    }
+
+    /**
+     * Each tab the person may see, as drawn on this platform: id, label, icon, badge and URL.
+     *
+     * @return array<string, array{id: string, label: string, icon: string, badge: string, url: string, locked: bool}>
+     */
+    public function tabs(string $name): array
+    {
+        $rows = [];
+        foreach ($this->set($name)->tabs() as $id => $tab) {
+            if (! $this->allowed($tab)) {
+                continue;
+            }
+            $props = $tab->tab->toElement()->toArray(new CallbackRegistry)['props'];
+            $rows[$id] = [
+                'id' => $id,
+                'label' => (string) ($props['label'] ?? $id),
+                'icon' => (string) ($props['icon'] ?? ''),
+                'badge' => (string) ($props['badge'] ?? ''),
+                'url' => (string) ($props['url'] ?? ''),
+                'locked' => $tab->locked,
+            ];
+        }
+
+        return $rows;
+    }
+
+    public function moreLabel(string $name): string
+    {
+        return (string) ($this->moreProps($name)['label'] ?? '');
+    }
+
+    /** The More tab's URL, where Route::customTabs() puts the More screen. */
+    public function moreUrl(string $name): string
+    {
+        return (string) ($this->moreProps($name)['url'] ?? '');
+    }
+
+    /** Where Route::customTabs() puts the editor: below the More screen, so it opens in More. */
+    public function editorUrl(string $name): string
+    {
+        return rtrim($this->moreUrl($name), '/').'/edit';
     }
 
     /** Go back to the declared defaults. */
@@ -97,7 +151,7 @@ final class CustomTabs
         $this->set($name);
         $this->store->forget($name);
         $arrangement = $this->arrangement($name);
-        $this->events->dispatch(new TabsCustomized($name, $arrangement));
+        event(new TabsCustomized($name, $arrangement));
 
         return $arrangement;
     }
@@ -130,6 +184,17 @@ final class CustomTabs
             $bar->add($more);
             $bar->withMore($more, array_map(fn (string $id) => $tabs[$id]->tab, $arrangement->more));
         }
+    }
+
+    /** @return array<string, mixed> */
+    private function moreProps(string $name): array
+    {
+        $more = $this->set($name)->moreTab();
+        if ($more === null) {
+            throw new InvalidArgumentException("Custom tab bar [{$name}] has no More tab; declare it with more().");
+        }
+
+        return $more->toElement()->toArray(new CallbackRegistry)['props'];
     }
 
     private function allowed(DeclaredTab $tab): bool
