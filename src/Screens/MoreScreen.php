@@ -31,7 +31,11 @@ class MoreScreen extends NativeComponent
     public function navigationOptions(): ?NavBarOptions
     {
         return NavBarOptions::make()->action(
-            NavAction::make('custom-tabs-edit')->label(__('custom-tabs::tabs.edit'))->press('edit'),
+            NavAction::make('custom-tabs-edit')
+                ->label(__('custom-tabs::tabs.edit'))
+                ->a11yLabel(__('custom-tabs::tabs.edit'))
+                ->icon(ios: 'pencil', android: 'edit')
+                ->press('edit'),
         );
     }
 

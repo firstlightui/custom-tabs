@@ -38,7 +38,11 @@ class EditorScreen extends NativeComponent
     public function navigationOptions(): ?NavBarOptions
     {
         return NavBarOptions::make()->action(
-            NavAction::make('custom-tabs-done')->label(__('custom-tabs::tabs.done'))->press('done'),
+            NavAction::make('custom-tabs-done')
+                ->label(__('custom-tabs::tabs.done'))
+                ->a11yLabel(__('custom-tabs::tabs.done'))
+                ->icon(ios: 'checkmark', android: 'check')
+                ->press('done'),
         );
     }
 
