@@ -1,0 +1,44 @@
+{
+    "name": "firstlightui/custom-tabs",
+    "description": "Let people choose and reorder the tabs of your NativePHP Mobile app, within the tabs, locks and limits you declare.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "nativephp/mobile": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "FirstlightUI\\CustomTabs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FirstlightUI\\CustomTabs\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "FirstlightUI\\CustomTabs\\CustomTabsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "require-dev": {
+        "pestphp/pest": "^5.0",
+        "orchestra/testbench": "^11.0",
+        "larastan/larastan": "^3.13",
+        "laravel/pint": "^1.27"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "lint": "pint --test",
+        "analyse": "phpstan analyse --no-progress --memory-limit=1G"
+    }
+}
