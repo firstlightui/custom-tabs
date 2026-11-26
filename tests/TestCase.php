@@ -42,15 +42,26 @@ abstract class TestCase extends BaseTestCase
         View::addLocation(__DIR__.'/Fixtures/views');
 
         // NativePHP registers plugin tags from the app's plugin manifests; tests have none.
-        $manifest = json_decode((string) file_get_contents(dirname(__DIR__).'/vendor/firstlightui/nativephp/nativephp.json'), true);
-        foreach ($manifest['components'] as $component) {
+        foreach (self::firstlightComponents() as $component) {
             Blade::component('native-'.str_replace('.', '-', $component['type']), $component['blade']);
-            ElementRegistry::register($component['type'], $component['element']);
         }
+    }
+
+    /** @return list<array{type: string, element: string, blade: string}> */
+    private static function firstlightComponents(): array
+    {
+        $manifest = json_decode((string) file_get_contents(dirname(__DIR__).'/vendor/firstlightui/nativephp/nativephp.json'), true);
+
+        return $manifest['components'];
     }
 
     protected function defineEnvironment($app): void
     {
+        // Before boot: NativePHP after 4.8 locks the element registry once the app has booted.
+        foreach (self::firstlightComponents() as $component) {
+            ElementRegistry::register($component['type'], $component['element']);
+        }
+
         // Before routes resolve CustomTabs, so no test touches the real JSON store.
         $app->instance(TabPreferenceStore::class, new Fixtures\ArrayStore);
     }
