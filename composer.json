@@ -6,7 +6,7 @@
     "require": {
         "php": "^8.4",
         "nativephp/mobile": "^4.9",
-        "firstlightui/nativephp": "dev-main"
+        "firstlightui/nativephp": "^1.2"
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +25,6 @@
             ]
         }
     },
-    "minimum-stability": "dev",
     "require-dev": {
         "pestphp/pest": "^5.0",
         "orchestra/testbench": "^11.0",

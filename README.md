@@ -2,7 +2,13 @@
 
 Let people choose and reorder the tabs of your NativePHP Mobile app, within the tabs, locks and limits you declare.
 
-Work in progress, not released yet. It needs Firstlight's Reorder List, which is on Firstlight `main` and not yet in a release.
+It needs Firstlight 1.2 or later and NativePHP Mobile 4.9 or later.
+
+```bash
+composer require firstlightui/custom-tabs
+```
+
+See [Let people customise their tabs](https://firstlightui.dev/docs/how-to/let-people-customise-tabs) for the full recipe.
 
 ```php
 use FirstlightUI\CustomTabs\Facades\CustomTabs;
