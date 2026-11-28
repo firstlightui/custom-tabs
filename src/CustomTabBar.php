@@ -32,11 +32,10 @@ final class CustomTabBar extends TabBar
         return $this;
     }
 
-    /** NativePHP after 4.8 also passes the tab the layout asked to highlight; 4.8 ignores it. */
+    /** NativePHP passes the current URL and the id of a tab the layout asked to highlight. */
     public function highlight(?string $currentUrl, ?string $tabId = null): self
     {
-        // Spread so the 4.8 signature that static analysis reads accepts the second argument.
-        parent::highlight(...func_get_args());
+        parent::highlight($currentUrl, $tabId);
 
         if ($this->moreTab === null || $currentUrl === null || $currentUrl === '') {
             return $this;
@@ -44,7 +43,7 @@ final class CustomTabBar extends TabBar
 
         foreach ($this->getTabs() as $tab) {
             // A tab picked by id stays the only highlighted one.
-            if ($tabId !== null && $tabId !== '' && method_exists($tab, 'getId') && $tab->getId() === $tabId) {
+            if ($tabId !== null && $tabId !== '' && $tab->getId() === $tabId) {
                 return $this;
             }
 

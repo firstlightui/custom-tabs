@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "nativephp/mobile": "^4.8",
+        "nativephp/mobile": "^4.9",
         "firstlightui/nativephp": "dev-main"
     },
     "autoload": {

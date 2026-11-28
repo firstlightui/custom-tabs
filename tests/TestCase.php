@@ -57,7 +57,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function defineEnvironment($app): void
     {
-        // Before boot: NativePHP after 4.8 locks the element registry once the app has booted.
+        // Before boot: NativePHP locks the element registry once the app has booted.
         foreach (self::firstlightComponents() as $component) {
             ElementRegistry::register($component['type'], $component['element']);
         }
